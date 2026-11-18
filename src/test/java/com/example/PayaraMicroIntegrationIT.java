@@ -10,9 +10,14 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
@@ -39,8 +44,8 @@ public class PayaraMicroIntegrationIT {
             .withEnv("DB_USER", "duke")
             .withEnv("DB_PASSWORD", "secretpassword")
             .withCopyFileToContainer(
-                    MountableFile.forHostPath(Paths.get("target/dukes-app.war")),
-                    "/opt/payara/deployments/dukes-app.war"
+                    MountableFile.forHostPath(Paths.get("target/jakarta11-web-demo.war")),
+                    "/opt/payara/deployments/jakarta11-web-demo.war"
             )
             .withCopyFileToContainer(
                     MountableFile.forHostPath(findMariaDbDriverPath()),
@@ -58,21 +63,20 @@ public class PayaraMicroIntegrationIT {
     public void testAppIsResponding() {
         int mappedPort = PAYARA_MICRO.getMappedPort(8080);
         String host = PAYARA_MICRO.getHost();
-        
-        // Esempio con HttpClient nativo di Java 11+
+
         try {
-            java.net.URI uri = java.net.URI.create("http://" + host + ":" + mappedPort + "/jakarta11-web-demo/");
-            java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
-            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder().uri(uri).build();
-            java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
-            
-            // Verifica che l'applicazione risponda (es. 200 OK o altro codice atteso)
-            assertTrue(response.statusCode() == 200 || response.statusCode() == 404);
+            // Chiama la pagina index.html dell'applicazione usando il nome corretto del WAR
+            URI uri = URI.create("http://" + host + ":" + mappedPort + "/jakarta11-web-demo/");
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder().uri(uri).build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            // Verifica che l'app risponda con 200 OK
+            assertEquals(200, response.statusCode());
         } catch (Exception e) {
             throw new RuntimeException("Impossibile connettersi all'endpoint di test", e);
         }
     }
-
 
     private static Path findMariaDbDriverPath() {
         try {
