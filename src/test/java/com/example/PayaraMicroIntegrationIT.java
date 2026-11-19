@@ -1,5 +1,7 @@
 package com.example;
 
+import java.time.Duration;
+
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MariaDBContainer;
@@ -22,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
 public class PayaraMicroIntegrationIT {
+private static final String APP_CONTEXT = "/jakarta11-web-demo/";
 
     private static final Network NETWORK = Network.newNetwork();
 
@@ -52,7 +55,13 @@ public class PayaraMicroIntegrationIT {
                     "/opt/payara/libs/mariadb-java-client.jar"
             )
             .withCommand("--addlibs /opt/payara/libs/mariadb-java-client.jar --deploy /opt/payara/deployments/jakarta11-web-demo.war")
-            .waitingFor(Wait.forLogMessage(".*Payara Micro .* ready in .*\\n", 1));
+           // .waitingFor(Wait.forLogMessage(".*Payara Micro .* ready in .*\\n", 1));
+.waitingFor(
+    Wait.forHttp(APP_CONTEXT)
+        .forPort(8080)
+        .forStatusCode(200)
+        .withStartupTimeout(Duration.ofMinutes(3))
+);
 
     @Test
     public void testPayaraMicroContainerIsRunning() {
