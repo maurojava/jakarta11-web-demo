@@ -35,4 +35,4 @@ jobs:
       - name: Run Maven Verify
         env:
           DOCKER_HOST: unix:///var/run/docker.sock
-        run: mvn clean verif%y
+        run: mvn clean verify
