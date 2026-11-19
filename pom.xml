@@ -61,7 +61,9 @@
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
             <version>3.3.3</version>
-            <scope>test</scope>
+            <!--<scope>test</scope>-->
+
+            <scope>compile</scope>
         </dependency>
 
         <!-- EclipseLink per i test locali (JPA) -->
@@ -104,10 +106,10 @@
                     <release>21</release>
                 </configuration>
             </plugin>
-
+   
 <plugin>
     <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-failsafe-plugin</artifactId>
+ <artifactId>maven-failsafe-plugin</artifactId>
     <version>3.5.2</version>
     <executions>
         <execution>
@@ -119,6 +121,27 @@
     </executions>
 </plugin>
 
+ <!--
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-failsafe-plugin</artifactId>
+    <version>3.5.2</version>
+    <configuration>
+        <environmentVariables>
+            <DOCKER_HOST>unix:///var/run/docker.sock</DOCKER_HOST>
+            <TESTCONTAINERS_RYUK_DISABLED>true</TESTCONTAINERS_RYUK_DISABLED>
+        </environmentVariables>
+    </configuration>
+    <executions>
+        <execution>
+            <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+ -->
         </plugins>
     </build>
 </project>

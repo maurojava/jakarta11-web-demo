@@ -18,27 +18,31 @@ services:
     image: adminer
     container_name: dukes_adminer
     ports:
-      - "2780:8080"
+      - "2785:8080"
     depends_on:
       - mariadb
     networks:
       - dukes-net
 
+    
   payara-micro:
     image: payara/micro:7.2026.7-jdk25
     container_name: dukes_payara_micro
     ports:
       - "2780:8080"
+    volumes:
+      - ./target/jakarta11-web-demo.war:/opt/payara/deployments/app.war
     environment:
-      - DB_HOST=mariadb
-      - DB_PORT=3306
-      - DB_NAME=dukes_db
-      - DB_USER=duke
-      - DB_PASSWORD=secretpassword
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_NAME: dukes_db
+      DB_USER: duke
+      DB_PASSWORD: secretpassword
     depends_on:
       - mariadb
     networks:
       - dukes-net
+
 
 volumes:
   mariadb_data:
@@ -46,3 +50,4 @@ volumes:
 networks:
   dukes-net:
     driver: bridge
+
